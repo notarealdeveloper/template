@@ -4,9 +4,7 @@ PYTHON 	:= python
 PIP 	:= $(PYTHON) -m pip
 PYTEST	:= $(PYTHON) -m pytest
 
-build:
-	@$(PIP) install --upgrade pip
-	@$(PIP) install build
+build: with-build
 	$(PYTHON) -m build
 
 install: build
@@ -15,8 +13,7 @@ install: build
 develop:
 	$(PIP) install -e .
 
-check:
-	@$(PIP) install -q pytest
+check: with-pytest
 	$(PYTEST) -v tests
 
 uninstall:
@@ -25,7 +22,7 @@ uninstall:
 clean:
 	rm -rvf dist/ build/ src/*.egg-info
 
-push-test:
+push-test: with-twine
 	$(PYTHON) -m twine upload --repository testpypi dist/*
 
 pull-test:
@@ -36,3 +33,6 @@ push-prod:
 
 pull-prod:
 	$(PIP) install $(PKG)
+
+with-%:
+	@$(PYTHON) -c "import $*" 2>/dev/null || $(PIP) install $*
